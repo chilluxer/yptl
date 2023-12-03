@@ -10,7 +10,7 @@ INVALID_ARGUMENT = INVALID_MODULE_NAME
 MANUAL_SEED = 42
 
 
-@pytest.fixture
+@pytest.fixture()
 def hparams():
     layer_1 = {"name": "Linear", "args": {"in_features": 1, "out_features": 2}}
     layer_2 = {"name": "ReLU", "args": {}}
