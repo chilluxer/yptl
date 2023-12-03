@@ -22,5 +22,5 @@ def create_torch_module(name: str, args: Dict) -> torch.nn.Module:
 def check_if_module_is_available(module_name: str, module_dict: Dict[str, torch.nn.Module]):
     if module_name not in module_dict.keys():
         raise ValueError(
-            f"{module_name} not found in list of available modules: {' '.join(i for i in module_dict.keys())}"
+            f"{module_name} not found in list of available modules: {' '.join(i for i in module_dict.keys())}",
         )
