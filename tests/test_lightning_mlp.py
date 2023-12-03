@@ -9,7 +9,7 @@ from torch.nn import Linear
 from yptl.utilities import create_torch_module
 
 
-@pytest.fixture
+@pytest.fixture()
 def hparams():
     activation = {"type": "ReLU", "args": {}}
     return Namespace(n_inp=1, n_out=2, hidden_layers=[32, 32], activation=activation)
