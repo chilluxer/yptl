@@ -4,6 +4,7 @@ import pytest
 import torch
 
 from yptl import LightningModel
+from yptl.utilities.inspect_torch import ClassNotFoundInModuleError
 
 INVALID_MODULE_NAME = "banana"
 INVALID_ARGUMENT = INVALID_MODULE_NAME
@@ -17,7 +18,7 @@ def hparams():
     return Namespace(model=[layer_1, layer_2])
 
 
-def test_forward_pass_of_model_in_LightningModel(hparams):
+def test_forward_pass(hparams):
     torch.manual_seed(MANUAL_SEED)
     model = LightningModel(hparams)
     model_output = model.forward(torch.zeros(1, 1))
@@ -29,7 +30,7 @@ def test_forward_pass_of_model_in_LightningModel(hparams):
 def test_throw_if_unknown_module_is_passed_in_dictionary():
     layer_1 = {"name": INVALID_MODULE_NAME, "args": {}}
     hparams = Namespace(model=[layer_1])
-    with pytest.raises(ValueError):
+    with pytest.raises(ClassNotFoundInModuleError):
         LightningModel(hparams)
 
 

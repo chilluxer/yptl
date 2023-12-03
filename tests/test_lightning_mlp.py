@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from argparse import Namespace
-from typing import List
 
 import pytest
 import torch.nn
@@ -19,7 +20,7 @@ class LightningMLP(LightningModule):
     activation_: torch.nn.Module
     n_inp_: int
     n_out_: int
-    hidden_layers_: List[int]
+    hidden_layers_: list[int]
     model: torch.nn.Sequential
 
     def __init__(self, hparams: Namespace):
@@ -31,16 +32,16 @@ class LightningMLP(LightningModule):
         self.model = torch.nn.Sequential()
         self.activation = create_torch_module(hparams.activation["type"], hparams.activation["args"])
 
-        neurons = [self.n_inp_] + self.hidden_layers_ + [self.n_out_]
+        neurons = [self.n_inp_, *self.hidden_layers_, self.n_out_]
         for i, _ in enumerate(neurons[:-1]):
             self.model.append(Linear(neurons[i], neurons[i]))
             self.model.append(self.activation)
         self.model.append(Linear(neurons[-2], neurons[-1]))
 
-    def forward(self, X: torch.tensor):
+    def forward(self, x: torch.tensor) -> torch.Tensor:
         pass
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, batch_idx) -> None:
         pass
 
     def test_step(self, batch, batch_idx):
