@@ -21,13 +21,13 @@ class LightningMLP(LightningModule):  # noqa: D101
         self.activation = create_torch_module(self.hparams.activation["type"], self.hparams.activation["args"])
 
         neurons = [self.hparams.n_inp, *self.hparams.hidden_layers, self.hparams.n_out]
-        for i, _ in enumerate(neurons[:-1]):
-            self.model.append(Linear(neurons[i], neurons[i]))
+        for i, _ in enumerate(neurons[:-2]):
+            self.model.append(Linear(neurons[i], neurons[i + 1]))
             self.model.append(self.activation)
         self.model.append(Linear(neurons[-2], neurons[-1]))
 
     def forward(self, x: torch.tensor) -> torch.Tensor:  # noqa: D102
-        pass
+        return self.model(x)
 
     def training_step(self, batch, batch_idx) -> None:  # noqa: ANN001, D102
         pass
