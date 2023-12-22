@@ -1,3 +1,3 @@
-from yptl.models import LightningModel  # noqa: D104
+from yptl.models import LightningMLP, LightningModel  # noqa: D104
 
-__all__ = ["LightningModel"]
+__all__ = ["LightningModel", "LightningMLP"]
