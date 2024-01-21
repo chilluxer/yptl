@@ -1,33 +1,33 @@
 from __future__ import annotations  # noqa: D100
 
-from typing import Optional, Union
-
 import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Linear
 
-from yptl.utilities.defaults import add_default_loss_function, add_default_optimizer
-from yptl.utilities.inspect_torch import create_torch_lr_scheduler, create_torch_module, create_torch_optimizer
+from yptl.utilities.defaults import add_default_activation, add_default_loss_function, add_default_optimizer
+from yptl.utilities.inspect_torch import create_torch_module, get_torch_lr_scheduler, get_torch_optimizer
 
 
 class LightningMLP(LightningModule):  # noqa: D101
     activation_: torch.nn.Module
     model: torch.nn.Sequential
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
-        n_inp: int,
-        n_out: int,
-        hidden_layers: list[int],
-        activation: dict[str, str | dict],
-        optimizer: None | dict[str, str | dict] = None,
-        loss_fn: None | dict[str, str | dict] = None,
-        **kwargs,
+        n_inp: int,  # noqa: ARG002
+        n_out: int,  # noqa: ARG002
+        hidden_layers: list[int],  # noqa: ARG002
+        activation: None | dict[str, str | dict] = None,  # noqa: ARG002
+        optimizer: None | dict[str, str | dict] = None,  # noqa: ARG002
+        loss_fn: None | dict[str, str | dict] = None,  # noqa: ARG002
+        **kwargs,  # noqa: ANN003, ARG002
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
 
         self.model = torch.nn.Sequential()
+        if not self.hparams.activation:
+            add_default_activation(self.hparams)
         self.activation = create_torch_module(self.hparams.activation["type"], self.hparams.activation["args"])
 
         neurons = [self.hparams.n_inp, *self.hparams.hidden_layers, self.hparams.n_out]
@@ -69,13 +69,19 @@ class LightningMLP(LightningModule):  # noqa: D101
     def configure_optimizers(self):  # noqa: ANN201, D102
         ret_dict = {}
         optimizer_dict = self.hparams.optimizer
-        optimizer_dict["args"]["params"] = self.parameters()
-        optimizer = create_torch_optimizer(optimizer_dict["type"], optimizer_dict["args"])
+        optimizer_cls = get_torch_optimizer(optimizer_dict["type"])
+        optimizer = optimizer_cls(params=self.parameters(), **optimizer_dict["args"])
         ret_dict["optimizer"] = optimizer
 
         if "lr_scheduler" in self.hparams:
             scheduler_dict = self.hparams.lr_scheduler
-            scheduler_dict["args"]["optimizer"] = optimizer
-            lr_scheduler = create_torch_lr_scheduler(scheduler_dict["type"], scheduler_dict["args"])
+            lr_scheduler_cls = get_torch_lr_scheduler(scheduler_dict["type"])
+            lr_scheduler = lr_scheduler_cls(optimizer, **scheduler_dict["args"])
             ret_dict["lr_scheduler"] = lr_scheduler
+
+            # ReduceLROnPleateau requires an additional "monitor" value
+            # see_ https://lightning.ai/docs/pytorch/stable/common/lightning_module.html#configure-optimizers
+            if lr_scheduler_cls is torch.optim.lr_scheduler.ReduceLROnPlateau:
+                ret_dict["monitor"] = "val_loss"
+
         return ret_dict

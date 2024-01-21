@@ -40,7 +40,6 @@ def test_run_training_step(hparams, dataloader):
     model = LightningMLP(**hparams)
     trainer = Trainer(max_epochs=1, enable_checkpointing=False, logger=False)
     trainer.fit(model, dataloader)
-    print(trainer.logged_metrics)
     assert torch.allclose(trainer.logged_metrics["train_loss_epoch"], torch.tensor(0.29835150))
 
 
@@ -64,3 +63,26 @@ def test_configure_lr_scheduler(hparams):
         **hparams, lr_scheduler={"type": "ReduceLROnPlateau", "args": {"factor": 0.1}}
     ).configure_optimizers()
     assert isinstance(optim_dict["lr_scheduler"], torch.optim.lr_scheduler.ReduceLROnPlateau)
+
+
+def test_load_from_checkpoint(hparams, dataloader, tmp_path):
+    model = LightningMLP(**hparams, lr_scheduler={"type": "ReduceLROnPlateau", "args": {"factor": 0.1}})
+
+    from pytorch_lightning.callbacks import ModelCheckpoint
+
+    checkpoint_callback = ModelCheckpoint(
+        dirpath=tmp_path / "checkpoints/",
+    )
+    trainer = Trainer(max_epochs=1, callbacks=[checkpoint_callback], logger=False)
+    trainer.test(model=model, dataloaders=dataloader)
+    initial_loss = trainer.logged_metrics["test_loss"]
+    trainer.fit(model, train_dataloaders=dataloader, val_dataloaders=dataloader)
+    trainer.test(model=model, dataloaders=dataloader)
+    loss_model = trainer.logged_metrics["test_loss"]
+    assert loss_model < initial_loss
+    # Force checkpoint to be loaded by using ckpt_path parameter
+    # see: https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.trainer.trainer.Trainer.html#lightning.pytorch.trainer.trainer.Trainer.test
+    trainer.test(dataloaders=dataloader, ckpt_path="best")
+    loss_ckpt = trainer.logged_metrics["test_loss"]
+
+    assert torch.allclose(loss_model, loss_ckpt)
