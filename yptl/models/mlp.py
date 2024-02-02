@@ -4,8 +4,9 @@ import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Linear
 
+from yptl.models.helper import configure_optimizers_from_model_hparams
 from yptl.utilities.defaults import add_default_activation, add_default_loss_function, add_default_optimizer
-from yptl.utilities.inspect_torch import create_torch_module, get_torch_lr_scheduler, get_torch_optimizer
+from yptl.utilities.inspect_torch import create_torch_module
 
 
 class LightningMLP(LightningModule):  # noqa: D101
@@ -18,6 +19,7 @@ class LightningMLP(LightningModule):  # noqa: D101
         n_out: int,  # noqa: ARG002
         hidden_layers: list[int],  # noqa: ARG002
         activation: None | dict[str, str | dict] = None,  # noqa: ARG002
+        output_activation: None | dict[str, str | dict] = None,
         optimizer: None | dict[str, str | dict] = None,  # noqa: ARG002
         loss_fn: None | dict[str, str | dict] = None,  # noqa: ARG002
         **kwargs,  # noqa: ANN003, ARG002
@@ -35,6 +37,8 @@ class LightningMLP(LightningModule):  # noqa: D101
             self.model.append(Linear(neurons[i], neurons[i + 1]))
             self.model.append(self.activation)
         self.model.append(Linear(neurons[-2], neurons[-1]))
+        if output_activation:
+            self.model.append(create_torch_module(output_activation["type"], output_activation["args"]))
 
         if not self.hparams.optimizer:
             add_default_optimizer(self.hparams)
@@ -67,21 +71,4 @@ class LightningMLP(LightningModule):  # noqa: D101
         self.log("test_loss", loss, on_epoch=True)
 
     def configure_optimizers(self):  # noqa: ANN201, D102
-        ret_dict = {}
-        optimizer_dict = self.hparams.optimizer
-        optimizer_cls = get_torch_optimizer(optimizer_dict["type"])
-        optimizer = optimizer_cls(params=self.parameters(), **optimizer_dict["args"])
-        ret_dict["optimizer"] = optimizer
-
-        if "lr_scheduler" in self.hparams:
-            scheduler_dict = self.hparams.lr_scheduler
-            lr_scheduler_cls = get_torch_lr_scheduler(scheduler_dict["type"])
-            lr_scheduler = lr_scheduler_cls(optimizer, **scheduler_dict["args"])
-            ret_dict["lr_scheduler"] = lr_scheduler
-
-            # ReduceLROnPleateau requires an additional "monitor" value
-            # see_ https://lightning.ai/docs/pytorch/stable/common/lightning_module.html#configure-optimizers
-            if lr_scheduler_cls is torch.optim.lr_scheduler.ReduceLROnPlateau:
-                ret_dict["monitor"] = "val_loss"
-
-        return ret_dict
+        return configure_optimizers_from_model_hparams(self)
