@@ -1,0 +1,46 @@
+---
+
+DataModule:
+  type: MNISTDataModule
+  args:
+    batch_size: 64
+    data_dir: "./mnist"
+
+Model:
+  type: LightningSequentialModel
+  args:
+    model:
+      - type: Flatten
+        args:
+      - type: Linear
+        args: 
+          in_features: 784
+          out_features: 5 #64
+      - type: ReLU
+        args:
+      - type: Dropout
+        args: 
+          p: 0.1
+      - type: Linear
+        args: 
+          in_features: 5 #64
+          out_features: 5 # 64
+      - type: ReLU
+        args:
+      - type: Dropout
+        args: 
+          p: 0.1
+      - type: Linear
+        args: 
+          in_features: 5 # 64
+          out_features: 10
+      - type: LogSoftmax
+        args: 
+          dim: 1
+    loss_fn:
+      type: NLLLoss
+      args:
+
+Trainer:
+  max_epochs: 1
+  fast_dev_run: 10 # Only run 10 training batches for testing

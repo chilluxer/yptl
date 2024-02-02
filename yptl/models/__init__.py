@@ -1,4 +1,4 @@
-from yptl.models.lightning_mlp import LightningMLP  # noqa: D104
-from yptl.models.lightning_model import LightningModel
+from yptl.models.mlp import LightningMLP  # noqa: D104
+from yptl.models.sequential_model import LightningSequentialModel
 
-__all__ = ["LightningModel", "LightningMLP"]
+__all__ = ["LightningSequentialModel", "LightningMLP"]
