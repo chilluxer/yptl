@@ -8,18 +8,19 @@ if TYPE_CHECKING:
     from pytorch_lightning import LightningModule
     from pytorch_lightning.utilities.types import OptimizerLRScheduler
 
+from yptl.utilities import YPTLDict
 from yptl.utilities.inspect_torch import create_torch_module, get_torch_lr_scheduler, get_torch_optimizer
 
 
 def configure_optimizers_from_model_hparams(model: LightningModule) -> OptimizerLRScheduler:  # noqa: D103
     ret_dict = {}
-    optimizer_dict = model.hparams.optimizer
+    optimizer_dict = YPTLDict(model.hparams.optimizer)
     optimizer_cls = get_torch_optimizer(optimizer_dict["type"])
     optimizer = optimizer_cls(params=model.parameters(), **optimizer_dict["args"])
     ret_dict["optimizer"] = optimizer
 
     if "lr_scheduler" in model.hparams:
-        scheduler_dict = model.hparams.lr_scheduler
+        scheduler_dict = YPTLDict(model.hparams.lr_scheduler)
         lr_scheduler_cls = get_torch_lr_scheduler(scheduler_dict["type"])
         lr_scheduler = lr_scheduler_cls(optimizer, **scheduler_dict["args"])
         ret_dict["lr_scheduler"] = lr_scheduler
@@ -37,7 +38,8 @@ def create_sequential_model(  # noqa: D103
 ) -> torch.nn.ModuleList:
     model = torch.nn.Sequential()
     for module_definition in layer_definitions:
-        name = module_definition["type"]
-        arguments = module_definition["args"]
+        module_config = YPTLDict(module_definition)
+        name = module_config.type
+        arguments = module_config.args
         model.append(create_torch_module(name, arguments))
     return model
