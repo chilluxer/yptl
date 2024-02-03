@@ -22,6 +22,9 @@ class YPTLDict(AttributeDict):  # noqa: D101
         if "args" not in self:
             self.args = {}
 
+        if not self.args:
+            self.args = {}
+
         if not isinstance(self.args, dict):
             msg = f"In a YPTLDict 'args' must be a dictionary.\n\nYPTLDict: {self}"
             raise TypeError(msg)
