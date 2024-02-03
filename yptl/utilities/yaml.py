@@ -14,7 +14,7 @@ from pytorch_lightning import Trainer
 
 import yptl
 from yptl.utilities import YPTLDict
-from yptl.utilities.inspect_torch import get_cls_from_module
+from yptl.utilities.inspect_torch import create_callback, get_cls_from_module
 
 
 def read_yptl_template_file(path: str | os.PathLike) -> dict:  # noqa: D103
@@ -30,6 +30,12 @@ def create_model_from_yaml_config(config: dict) -> LightningModule:
 
 def create_trainer_from_config(config: dict) -> Trainer:
     """Create pytorch lightning trainer class from yptl yaml config."""
+    if "callbacks" in config:
+        callback_configs = config["callbacks"] if isinstance(config["callbacks"], list) else [config["callbacks"]]
+        callback_configs = [YPTLDict(c) for c in callback_configs]
+        callbacks = [create_callback(c.type, c.args) for c in callback_configs]
+        config["callbacks"] = callbacks
+
     return Trainer(**config)
 
 

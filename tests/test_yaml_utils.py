@@ -18,6 +18,10 @@ Model:
 
 Trainer:
     max_epochs: 1
+    callbacks:
+      - type: LearningRateMonitor
+        args:
+          logging_interval: step
 """
 
     return yaml.safe_load(yaml_string)

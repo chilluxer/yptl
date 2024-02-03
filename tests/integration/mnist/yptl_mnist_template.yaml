@@ -43,3 +43,5 @@ Model:
 Trainer:
   max_epochs: 1
   fast_dev_run: 10 # Only run 10 training batches for testing
+  callbacks:
+    - type: LearningRateMonitor
