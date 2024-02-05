@@ -49,14 +49,21 @@ jobs:
     - name: Install Poetry
       uses: Gr1N/setup-poetry@v8
 
+    - name: Cache virtual envs
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry/virtualenvs
+        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+
     - name: Install library and dependencies
       run: |
         poetry run pip install --upgrade pip setuptools
         poetry install --with tests
 
-    - name: Run Tox (Pytest + Coverage)
+    - name: Run Pytest + Coverage
       run: |
-        poetry run tox
+        poetry run pytest
+        poetry run coverage report
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PLATFORM: ${{ matrix.os }}
@@ -65,7 +72,6 @@ jobs:
       if: success()
       uses: codecov/codecov-action@v3
       with:
-        env_vars: TOXENV
         fail_ci_if_error: false
         files: ./tests/reports/coverage-html/index.html,./tests/reports/coverage.xml
         flags: unittests
