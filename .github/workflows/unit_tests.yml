@@ -34,6 +34,10 @@ jobs:
 
     steps:
 
+    # https://github.com/jlumbroso/free-disk-space/blob/main/action.yml
+    - name: Free up some disk space
+      run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
