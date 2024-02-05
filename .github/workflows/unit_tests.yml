@@ -49,6 +49,12 @@ jobs:
     - name: Install Poetry
       uses: Gr1N/setup-poetry@v8
 
+    - name: Cache virtual envs
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry/virtualenvs
+        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+
     - name: Install library and dependencies
       run: |
         poetry run pip install --upgrade pip setuptools
