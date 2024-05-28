@@ -29,7 +29,11 @@ def create_model_from_yaml_config(config: dict) -> LightningModule:
 def create_trainer_from_config(config: dict) -> Trainer:
     """Create pytorch lightning trainer class from yptl yaml config."""
     if "callbacks" in config:
-        callback_configs = config["callbacks"] if isinstance(config["callbacks"], list) else [config["callbacks"]]
+        callback_configs = (
+            config["callbacks"]
+            if isinstance(config["callbacks"], list)
+            else [config["callbacks"]]
+        )
         callback_configs = [YPTLDict(c) for c in callback_configs]
         callbacks = [create_callback(c.type, c.args) for c in callback_configs]
         config["callbacks"] = callbacks
