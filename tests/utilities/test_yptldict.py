@@ -28,6 +28,8 @@ def test_throw_when_args_is_not_dict():
 def test_from_type_with_args():
     config = YPTLDict.from_type_with_args("Linear")
     assert isinstance(config.args, dict)
-    config = YPTLDict.from_type_with_args("Linear", {"in_features": 2, "out_features": 5})
+    config = YPTLDict.from_type_with_args(
+        "Linear", {"in_features": 2, "out_features": 5}
+    )
     assert config.type == "Linear"
     assert isinstance(config.args, dict)

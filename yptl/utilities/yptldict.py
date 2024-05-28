@@ -21,14 +21,18 @@ class YPTLDict(AttributeDict):  # noqa: D101
             input_dict["args"] = {}
 
         if not isinstance(input_dict["args"], dict):
-            msg = f"In a YPTLDict 'args' must be a dictionary.\n\nYPTLDict: {input_dict}"
+            msg = (
+                f"In a YPTLDict 'args' must be a dictionary.\n\nYPTLDict: {input_dict}"
+            )
             raise TypeError(msg)
 
         # This line must be at the end of the init method that all modifications to the input_dict are copied into self
         super().__init__(input_dict)
 
     @classmethod
-    def from_type_with_args(cls: Type[YPTLDict], type_name: str, args: None | dict = None) -> YPTLDict:  # noqa: D102
+    def from_type_with_args(
+        cls: Type[YPTLDict], type_name: str, args: None | dict = None
+    ) -> YPTLDict:  # noqa: D102
         if not args:
             args = {}
         return cls({"type": type_name, "args": args})

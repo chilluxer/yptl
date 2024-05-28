@@ -9,10 +9,16 @@ if TYPE_CHECKING:
     from pytorch_lightning.utilities.types import OptimizerLRScheduler
 
 from yptl.utilities import YPTLDict
-from yptl.utilities.inspect_torch import create_torch_module, get_torch_lr_scheduler, get_torch_optimizer
+from yptl.utilities.inspect_torch import (
+    create_torch_module,
+    get_torch_lr_scheduler,
+    get_torch_optimizer,
+)
 
 
-def configure_optimizers_from_model_hparams(model: LightningModule) -> OptimizerLRScheduler:  # noqa: D103
+def configure_optimizers_from_model_hparams(
+    model: LightningModule,
+) -> OptimizerLRScheduler:  # noqa: D103
     ret_dict = {}
     optimizer_dict = YPTLDict(model.hparams.optimizer)
     optimizer_cls = get_torch_optimizer(optimizer_dict["type"])

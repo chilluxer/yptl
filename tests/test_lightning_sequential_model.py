@@ -19,4 +19,6 @@ def test_create_model(hparams):
 
 def test_forward_pass(hparams):
     model = LightningSequentialModel(**hparams)
-    assert torch.allclose(model.forward(torch.zeros(1, 1)), torch.tensor([[0.00000000, 0.91861129]]))
+    assert torch.allclose(
+        model.forward(torch.zeros(1, 1)), torch.tensor([[0.00000000, 0.91861129]])
+    )

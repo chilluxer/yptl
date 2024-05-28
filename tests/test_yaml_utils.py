@@ -3,7 +3,10 @@ import yaml
 from pytorch_lightning import Trainer
 
 import yptl
-from yptl.utilities.yaml import create_model_from_yaml_config, create_trainer_from_config
+from yptl.utilities.yaml import (
+    create_model_from_yaml_config,
+    create_trainer_from_config,
+)
 
 
 @pytest.fixture()

@@ -5,7 +5,11 @@ from pytorch_lightning import LightningModule
 from torch.nn import Linear
 
 from yptl.models.helper import configure_optimizers_from_model_hparams
-from yptl.utilities.defaults import add_default_activation, add_default_loss_function, add_default_optimizer
+from yptl.utilities.defaults import (
+    add_default_activation,
+    add_default_loss_function,
+    add_default_optimizer,
+)
 from yptl.utilities.inspect_torch import create_torch_module
 
 
@@ -30,7 +34,9 @@ class LightningMLP(LightningModule):  # noqa: D101
         self.model = torch.nn.Sequential()
         if not self.hparams.activation:
             add_default_activation(self.hparams)
-        self.activation = create_torch_module(self.hparams.activation["type"], self.hparams.activation["args"])
+        self.activation = create_torch_module(
+            self.hparams.activation["type"], self.hparams.activation["args"]
+        )
 
         neurons = [self.hparams.n_inp, *self.hparams.hidden_layers, self.hparams.n_out]
         for i, _ in enumerate(neurons[:-2]):
@@ -38,7 +44,11 @@ class LightningMLP(LightningModule):  # noqa: D101
             self.model.append(self.activation)
         self.model.append(Linear(neurons[-2], neurons[-1]))
         if output_activation:
-            self.model.append(create_torch_module(output_activation["type"], output_activation["args"]))
+            self.model.append(
+                create_torch_module(
+                    output_activation["type"], output_activation["args"]
+                )
+            )
 
         if not self.hparams.optimizer:
             add_default_optimizer(self.hparams)
@@ -46,7 +56,9 @@ class LightningMLP(LightningModule):  # noqa: D101
         if not self.hparams.loss_fn:
             add_default_loss_function(self.hparams)
 
-        self.loss_fn = create_torch_module(self.hparams.loss_fn["type"], self.hparams.loss_fn["args"])
+        self.loss_fn = create_torch_module(
+            self.hparams.loss_fn["type"], self.hparams.loss_fn["args"]
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D102
         return self.model(x)
@@ -55,7 +67,14 @@ class LightningMLP(LightningModule):  # noqa: D101
         x, y = batch
         y_hat = self(x)
         loss = self.loss_fn(y_hat, y)
-        self.log("train_loss", loss.detach(), on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log(
+            "train_loss",
+            loss.detach(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
         return loss
 
     def validation_step(self, batch: torch.Tensor, batch_idx: int):  # noqa: ARG002, ANN201, D102

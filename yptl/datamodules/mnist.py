@@ -63,7 +63,9 @@ class MNISTDataModule(LightningDataModule):
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
-            self.mnist_test = MNIST(self.data_dir, train=False, transform=self.transform)
+            self.mnist_test = MNIST(
+                self.data_dir, train=False, transform=self.transform
+            )
 
     def train_dataloader(self) -> DataLoader:
         """Return DataLoader for training data."""

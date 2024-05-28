@@ -14,7 +14,9 @@ from yptl.utilities.yptldict import YPTLDict
 
 
 class ClassNotFoundInModuleError(Exception):  # noqa: D101
-    def __init__(self, module: ModuleType, cls_name: str, available_modules: list) -> None:  # noqa: D107
+    def __init__(
+        self, module: ModuleType, cls_name: str, available_modules: list
+    ) -> None:  # noqa: D107
         super().__init__(
             f"Class '{cls_name}' not found in {module.__name__}. Available classes are: {' '.join(available_modules)}"
         )
@@ -56,8 +58,12 @@ def get_torch_lr_scheduler(name: str) -> torch.optim.lr_scheduler.LRScheduler:  
     return get_cls_from_module(name, torch.optim.lr_scheduler)
 
 
-def create_callback(name: str, args: None | dict = None) -> pytorch_lightning.callbacks.Callback:  # noqa: D103
-    return create_cls_from_module(name=name, args=args, module=pytorch_lightning.callbacks)
+def create_callback(
+    name: str, args: None | dict = None
+) -> pytorch_lightning.callbacks.Callback:  # noqa: D103
+    return create_cls_from_module(
+        name=name, args=args, module=pytorch_lightning.callbacks
+    )
 
 
 def raise_if_module_is_not_available(  # noqa: D103
