@@ -1,10 +1,10 @@
 import argparse  # noqa: D100
 
 from yptl.utilities.yaml import (
+    YPTLConfig,
     create_datamodule_from_config,
     create_model_from_yaml_config,
     create_trainer_from_config,
-    read_yptl_template_file,
 )
 
 
@@ -35,10 +35,10 @@ def main() -> None:
     """
     args = parse_args()
 
-    yptl_config = read_yptl_template_file(args.template)
-    model = create_model_from_yaml_config(yptl_config["Model"])
-    datamodule = create_datamodule_from_config(yptl_config["DataModule"])
-    trainer = create_trainer_from_config(yptl_config["Trainer"])
+    yptl_config = YPTLConfig.from_yaml(args.template)
+    model = create_model_from_yaml_config(yptl_config.model)
+    datamodule = create_datamodule_from_config(yptl_config.datamodule)
+    trainer = create_trainer_from_config(yptl_config.trainer)
 
     trainer.fit(model, datamodule)
 

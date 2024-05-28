@@ -10,6 +10,8 @@ import pytorch_lightning.callbacks
 import torch.nn
 import torch.optim
 
+from yptl.utilities.yptldict import YPTLDict
+
 
 class ClassNotFoundInModuleError(Exception):  # noqa: D101
     def __init__(self, module: ModuleType, cls_name: str, available_modules: list) -> None:  # noqa: D107
@@ -39,6 +41,11 @@ def get_cls_from_module(name: str, module: ModuleType):  # noqa: ANN201, D103
 
 def create_torch_module(name: str, args: dict | None = None) -> torch.nn.Module:  # noqa: D103
     return create_cls_from_module(name=name, args=args, module=torch.nn)
+
+
+def create_torch_module_from_yptl_dict(factory_dict: YPTLDict) -> torch.nn.Module:  # noqa: D103
+    yptldict = YPTLDict(factory_dict)
+    return create_torch_module(name=yptldict.type, args=yptldict.args)
 
 
 def get_torch_optimizer(name: str) -> torch.optim.Optimizer:  # noqa: D103
