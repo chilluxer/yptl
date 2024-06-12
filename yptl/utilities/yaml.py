@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import os
-    from types import ModuleType
 
     from pytorch_lightning import LightningDataModule, LightningModule
 
@@ -14,8 +13,6 @@ from pathlib import Path
 import yaml
 from pytorch_lightning import Trainer
 
-import yptl.datamodules
-import yptl.models
 from yptl.utilities.inspect_torch import create_callback, get_cls_from_module
 from yptl.utilities.yptldict import YPTLDict
 
@@ -23,7 +20,7 @@ from yptl.utilities.yptldict import YPTLDict
 def create_model_from_yaml_config(config: dict) -> LightningModule:
     """Create a model from yptl yaml config."""
     config = YPTLDict(config)
-    return get_cls_from_module(config.type, yptl.models)(**config.args)
+    return get_cls_from_module(config.type, "yptl.models")(**config.args)
 
 
 def create_trainer_from_config(config: dict) -> Trainer:
@@ -44,7 +41,7 @@ def create_trainer_from_config(config: dict) -> Trainer:
 def create_datamodule_from_config(config: dict) -> LightningDataModule:
     """Create datamodule from yptl yaml config."""
     config = YPTLDict(config)
-    return get_cls_from_module(config.type, yptl.datamodules)(**config.args)
+    return get_cls_from_module(config.type, "yptl.datamodules")(**config.args)
 
 
 class YPTLConfig:
@@ -148,12 +145,12 @@ def convert_keys_to_lowercase(input_dict: dict) -> dict:
 
 def check_model_config(model_config: dict) -> None:
     """Check content of the model dict of the YPTL config."""
-    check_factory_and_parameters(model_config, yptl.models)
+    check_factory_and_parameters(model_config, "yptl.models")
 
 
 def check_datamodule_config(datamodule_config: dict) -> None:
     """Check content of the datamodule dict of the YPTL config."""
-    check_factory_and_parameters(datamodule_config, yptl.datamodules)
+    check_factory_and_parameters(datamodule_config, "yptl.datamodules")
 
 
 def check_trainer_config(trainer_config: dict) -> None:
@@ -161,7 +158,7 @@ def check_trainer_config(trainer_config: dict) -> None:
     check_cls_signature(Trainer, trainer_config)
 
 
-def check_factory_and_parameters(config: dict, module: ModuleType) -> None:
+def check_factory_and_parameters(config: dict, module: str) -> None:
     """Check if config adheres to the yptl config rules for creating objects from dictionary entries using the type and args keywords."""
     config = YPTLDict(config)
     cls = get_cls_from_module(config.type, module)

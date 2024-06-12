@@ -4,7 +4,7 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader, TensorDataset
 
 from yptl.models import LightningMLP
-from yptl.utilities.inspect_torch import ClassNotFoundInModuleError
+from yptl.utilities.inspect_torch import ClassNotFoundInModulesError
 
 
 @pytest.fixture()
@@ -58,7 +58,7 @@ def test_configure_default_optimizers(hparams):
 
 
 def test_raise_with_invalid_optimizer(hparams):
-    with pytest.raises(ClassNotFoundInModuleError):
+    with pytest.raises(ClassNotFoundInModulesError):
         LightningMLP(
             **hparams, optimizer={"type": "Banana", "args": {}}
         ).configure_optimizers()

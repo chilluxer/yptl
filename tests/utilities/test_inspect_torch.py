@@ -2,7 +2,7 @@ import pytest
 import torch
 
 from yptl.utilities.inspect_torch import (
-    ClassNotFoundInModuleError,
+    ClassNotFoundInModulesError,
     create_torch_module,
     get_torch_lr_scheduler,
     get_torch_optimizer,
@@ -20,7 +20,7 @@ def test_create_torch_module():
 
 def test_create_torch_module_throw_if_unknown_module_is_passed_in_dictionary():
     layer_dict = {"type": INVALID_MODULE_NAME, "args": {}}
-    with pytest.raises(ClassNotFoundInModuleError):
+    with pytest.raises(ClassNotFoundInModulesError):
         _ = create_torch_module(layer_dict["type"], layer_dict["args"])
 
 
