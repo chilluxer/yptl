@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from pytorch_lightning import LightningDataModule, LightningModule
 
 import inspect
+from collections.abc import MutableMapping
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -44,60 +46,26 @@ def create_datamodule_from_config(config: dict) -> LightningDataModule:
     return get_cls_from_module(config.type, "yptl.datamodules")(**config.args)
 
 
+@dataclass(frozen=True)
 class YPTLConfig:
     """Contain the configuration of the YPTL components."""
 
-    def __init__(self, config: dict) -> None:  # noqa: D107
-        config = convert_keys_to_lowercase(config)
-        try:
-            self._model = config.pop("model")
-            self._datamodule = config.pop("datamodule")
-            self._trainer = config.pop("trainer")
-        except KeyError as exc:
-            msg = f"YPTLConfig requires all three keywords 'model', 'datamodule' and 'trainer', but could not find keyword {exc}"
-            raise KeyError(msg) from exc
-        try:
-            self._settings = config.pop("settings")
-        except KeyError:
-            self._settings = {}
-        self._check()
+    model: MutableMapping
+    datamodule: MutableMapping
+    trainer: MutableMapping
+    settings: MutableMapping = field(default_factory=dict)
+
+    def __post_init__(self) -> None:  # noqa: D107
+        for config in (self.model, self.datamodule, self.trainer):
+            add_args_keyword_to_factory_dicts(config)
+
+        check_model_config(self.model)
+        check_datamodule_config(self.datamodule)
+        check_trainer_config(self.trainer)
 
     def __str__(self) -> str:
         """Print the YPTLConfig class in a nice string representation."""
-        return yaml.dump(self._dict_repr())
-
-    def _dict_repr(self) -> dict:
-        return {
-            "settings": self._settings,
-            "datamodule": self._datamodule,
-            "model": self._model,
-            "trainer": self._trainer,
-        }
-
-    def _check(self) -> None:
-        check_model_config(self._model)
-        check_datamodule_config(self._datamodule)
-        check_trainer_config(self._trainer)
-
-    @property
-    def model(self) -> dict:
-        """Return model configuration."""
-        return self._model
-
-    @property
-    def datamodule(self) -> dict:
-        """Return datamodule configuration."""
-        return self._datamodule
-
-    @property
-    def trainer(self) -> dict:
-        """Return trainer configuration."""
-        return self._trainer
-
-    @property
-    def settings(self) -> dict:
-        """Return settings configuration."""
-        return self._settings
+        return yaml.dump(vars(self))
 
     def to_yaml(self, filename: str | os.PathLike) -> None:
         """
@@ -109,7 +77,7 @@ class YPTLConfig:
             filename (str): The name of the output YAML file.
         """
         with Path.open(Path(filename), "w") as yaml_file:
-            yaml.dump(self._dict_repr(), yaml_file)
+            yaml.dump(vars(self), yaml_file)
 
     @classmethod
     def from_yaml(cls: YPTLConfig, filename: str | os.PathLike) -> YPTLConfig:
@@ -125,7 +93,7 @@ class YPTLConfig:
             YPTLConfig class object
         """
         with Path.open(Path(filename), "r") as f:
-            return cls(yaml.safe_load(f))
+            return cls(**convert_keys_to_lowercase(yaml.safe_load(f)))
 
 
 def convert_keys_to_lowercase(input_dict: dict) -> dict:
@@ -141,6 +109,19 @@ def convert_keys_to_lowercase(input_dict: dict) -> dict:
         dict: A new dictionary with lowercase keys.
     """
     return {key.lower(): value for key, value in input_dict.items()}
+
+
+def add_args_keyword_to_factory_dicts(item) -> None:
+    if isinstance(item, dict):
+        if "type" in item:
+            if "args" not in item or not item["args"]:
+                item["args"] = {}
+        else:
+            for v in item.values():
+                add_args_keyword_to_factory_dicts(v)
+    elif isinstance(item, list):
+        for v in item:
+            add_args_keyword_to_factory_dicts(v)
 
 
 def check_model_config(model_config: dict) -> None:
