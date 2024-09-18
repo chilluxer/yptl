@@ -1,4 +1,4 @@
-from yptl.utilities.inspect_torch import create_torch_module  # noqa: D104
+from yptl.dynamic_import import create_torch_module  # noqa: D104
 from yptl.utilities.yaml import YPTLConfig
 from yptl.utilities.yptldict import YPTLDict
 

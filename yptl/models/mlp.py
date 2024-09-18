@@ -10,7 +10,7 @@ from yptl.utilities.defaults import (
     add_default_loss_function,
     add_default_optimizer,
 )
-from yptl.utilities.inspect_torch import create_torch_module
+from yptl.dynamic_import import create_torch_module
 
 
 class LightningMLP(LightningModule):  # noqa: D101

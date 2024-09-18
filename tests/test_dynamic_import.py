@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from yptl.utilities.inspect_torch import (
+from yptl.dynamic_import import (
     ClassNotFoundInModulesError,
     create_torch_module,
     get_torch_lr_scheduler,
@@ -43,7 +43,7 @@ def test_get_torch_lr_scheduler():
 
 @pytest.mark.usefixtures("_change_cwd_to_test_dir")
 def test_load_class_from_custom_source_file():
-    load_sourcefile_as_module("./myclass.py")
+    load_sourcefile_as_module("./files/myclass.py")
     import myclass
 
     name = "MyClass"

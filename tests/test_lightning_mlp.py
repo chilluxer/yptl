@@ -4,7 +4,7 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader, TensorDataset
 
 from yptl.models import LightningMLP
-from yptl.utilities.inspect_torch import ClassNotFoundInModulesError
+from yptl.dynamic_import import ClassNotFoundInModulesError
 
 
 @pytest.fixture()

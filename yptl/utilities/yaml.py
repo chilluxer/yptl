@@ -15,7 +15,7 @@ from pathlib import Path
 import yaml
 from pytorch_lightning import Trainer
 
-from yptl.utilities.inspect_torch import create_callback, get_cls_from_module
+from yptl.dynamic_import import create_callback, get_cls_from_module
 from yptl.utilities.yptldict import YPTLDict
 
 

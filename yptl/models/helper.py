@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from pytorch_lightning.utilities.types import OptimizerLRScheduler
 
 from yptl.utilities import YPTLDict
-from yptl.utilities.inspect_torch import (
+from yptl.dynamic_import import (
     create_torch_module,
     get_torch_lr_scheduler,
     get_torch_optimizer,
