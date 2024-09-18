@@ -1,6 +1,6 @@
 import argparse  # noqa: D100
 
-from yptl.utilities.yaml import (
+from yptl.yptl_config import (
     YPTLConfig,
     create_datamodule_from_config,
     create_model_from_yaml_config,

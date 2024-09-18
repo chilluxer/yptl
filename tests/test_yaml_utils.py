@@ -3,7 +3,7 @@ import yaml
 from pytorch_lightning import Trainer
 
 import yptl
-from yptl.utilities.yaml import (
+from yptl.yptl_config import (
     create_model_from_yaml_config,
     create_trainer_from_config,
 )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 import yaml
 
-from yptl.utilities.yaml import YPTLConfig, add_args_keyword_to_factory_dicts
+from yptl.yptl_config import YPTLConfig, add_args_keyword_to_factory_dicts
 
 
 @pytest.fixture()
@@ -41,7 +41,6 @@ def test_input_will_be_lowercased(tmp_path, yaml_input):
 
 def test_add_args_keyword_to_factory_dicts(yaml_input):
     add_args_keyword_to_factory_dicts(yaml_input)
-    print(yaml_input)
     assert isinstance(yaml_input["datamodule"]["args"], dict)
     assert all(
         [

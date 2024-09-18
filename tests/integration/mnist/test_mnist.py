@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from yptl.scripts.yptl import main
+from yptl.yptl import main
 
 
 @pytest.mark.usefixtures("_change_cwd_to_test_dir")
