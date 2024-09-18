@@ -1,4 +1,6 @@
 ---
+settings:
+  source_files: printing_callback.py
 
 DataModule:
   type: MNISTDataModule
@@ -45,3 +47,4 @@ Trainer:
   fast_dev_run: 10 # Only run 10 training batches for testing
   callbacks:
     - type: LearningRateMonitor
+    - type: MyPrintingCallback # Source in printing_callback.py

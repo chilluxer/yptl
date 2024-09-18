@@ -5,8 +5,8 @@ from yptl.yptl_config import (
     create_datamodule_from_config,
     create_model_from_yaml_config,
     create_trainer_from_config,
+    load_source_files_from_settings
 )
-
 
 def parse_args() -> argparse.Namespace:  # noqa: D103
     parser = argparse.ArgumentParser()
@@ -36,6 +36,7 @@ def main() -> None:
     args = parse_args()
 
     yptl_config = YPTLConfig.from_yaml(args.template)
+    load_source_files_from_settings(yptl_config.settings)
     model = create_model_from_yaml_config(yptl_config.model)
     datamodule = create_datamodule_from_config(yptl_config.datamodule)
     trainer = create_trainer_from_config(yptl_config.trainer)

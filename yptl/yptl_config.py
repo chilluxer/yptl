@@ -15,7 +15,7 @@ from pathlib import Path
 import yaml
 from pytorch_lightning import Trainer
 
-from yptl.dynamic_import import create_callback, get_cls_from_module
+from yptl.dynamic_import import create_callback, get_cls_from_module, load_sourcefile_as_module
 from yptl.utilities.yptldict import YPTLDict
 
 
@@ -44,6 +44,12 @@ def create_datamodule_from_config(config: dict) -> LightningDataModule:
     """Create datamodule from yptl yaml config."""
     config = YPTLDict(config)
     return get_cls_from_module(config.type, "yptl.datamodules")(**config.args)
+
+def load_source_files_from_settings(settings: dict) -> None:
+    """Load additional source files from yptl settings."""
+    source_files = settings["source_files"]
+    source_files = [source_files] if not isinstance(source_files, list) else source_files
+    _ = [load_sourcefile_as_module(file) for file in source_files]
 
 
 @dataclass(frozen=True)
